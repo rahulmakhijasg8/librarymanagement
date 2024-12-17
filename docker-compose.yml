@@ -1,0 +1,36 @@
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  web:
+    build: 
+      context: .
+      dockerfile: DockerFile
+    volumes:
+      - .:/app
+      - ./db.sqlite3:/app/db.sqlite3
+      - ./reports:/app/reports
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - DJANGO_SETTINGS_MODULE=libmanage.settings
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: DockerFile.celery
+    volumes:
+      - .:/app
+      - ./db.sqlite3:/app/db.sqlite3
+    depends_on:
+      - redis
+    environment:
+      - DJANGO_SETTINGS_MODULE=libmanage.settings
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
