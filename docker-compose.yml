@@ -7,7 +7,7 @@ services:
   web:
     build: 
       context: .
-      dockerfile: DockerFile
+      dockerfile: DockerFile.web
     volumes:
       - .:/app
       - ./db.sqlite3:/app/db.sqlite3
